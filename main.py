@@ -75,9 +75,10 @@ async def delete_to_do(id: str):
 
 
 """
+CHECKLIST
 GET - @app.get("/to-do") - COMPLETED
-GET - @app.get("/to-do/{title}")
-POST - @app.post("/to-do")
+GET - @app.get("/to-do/{title}") - COMPLETED
+POST - @app.post("/to-do") - COMPLETED
 PUT - @app.put("/to-do/{title}")
 DELETE - @app.delete("/to-do/{title}")
 """
