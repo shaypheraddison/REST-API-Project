@@ -1,0 +1,23 @@
+[
+    {
+        "id": "ay81",
+        "title": "Clean Bathroom",
+        "message": "Clean sink, scrub toilet and wipe mirror.",
+        "is_completed": false,
+        "Created": "01/21/24 at 21:36"
+    },
+    {
+        "id": "nL78",
+        "title": "Study",
+        "message": "Review materials needed.",
+        "is_completed": false,
+        "Created": "01/21/24 at 21:37"
+    },
+    {
+        "id": "aP86",
+        "title": "Doctor Visit",
+        "message": "Go to the doctor on Monday.",
+        "is_completed": false,
+        "Created": "01/21/24 at 21:38"
+    }
+]
