@@ -9,12 +9,9 @@ import random
 path = Path("./to-do-list.json")
 app = FastAPI()
 
-if path.is_file() == False:
-    with open(path, "a+") as writer:
-        writer.write("[\n\t\n]")
-else:
-    with open(path, "a+") as editor:
-        editor.read()
+if not path.is_file():
+    with open(path, "w") as writer:
+        writer.write("[]")
 
 class To_Do(BaseModel):
     id: Optional[str] | None = None
@@ -39,27 +36,40 @@ def calc_timestamp():
 @app.get("/to-do")
 async def get_to_do():
     with open(path, "r") as reader:
-       return reader.read()
+       return json.loads(reader.read())
     
 @app.post("/to-do")
 async def post_entry(new_entry: To_Do):
     to_do_entry_dict = new_entry.model_dump()
     to_do_entry_dict.update({"id": gen_rando_id()})
     to_do_entry_dict.update({"Created": calc_timestamp()})
-    with open(path, "a+") as editor:
-        editor.write(json.dumps(to_do_entry_dict, indent=4) + "\n\n")
+    with open(path, "r") as reader:
+        data = json.loads(reader.read())
+
+    data.append(to_do_entry_dict)
+    
+    with open(path, "w") as writer:
+        writer.write(json.dumps(data, indent=4))
+    return to_do_entry_dict
     
 @app.get("/to-do/{id}")
 async def get_single_to_to(id: str):
-    pass
+    with open(path, "r") as reader:
+        to_dos = json.loads(reader.read())
+        for to_do in to_dos:
+            if to_do["id"] == id:
+                return to_do
+            else:
+                return {"message": "This id does not exist"}
         
 @app.put("/to-do/{id}")
-async def update_to_do(id: str):
+async def update_to_do(id: str, updated_entry: To_Do):
     pass
 
 @app.delete("/to-do/{id}")
 async def delete_to_do(id: str):
     pass
+
 
 
 
