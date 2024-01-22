@@ -11,7 +11,7 @@ app = FastAPI()
 
 if not path.is_file():
     with open(path, "w") as writer:
-        writer.write("[]")
+        writer.write("[\n\t\n]")
 
 class To_Do(BaseModel):
     id: Optional[str] | None = None
