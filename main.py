@@ -16,7 +16,7 @@ mydb = mysql.connector.connect(
 mycursor = mydb.cursor()
 mycursor.execute(f"CREATE DATABASE IF NOT EXISTS {mydb.database}")
 mycursor.execute(
-    "CREATE TABLE IF NOT EXISTS things_to_do (id VARCHAR(4), category VARCHAR(20), title VARCHAR(20), message VARCHAR(255), is_completed BOOLEAN, created_timestamp DATETIME, completed_timestamp DATETIME)"
+    "CREATE TABLE IF NOT EXISTS things_to_do (id VARCHAR(4), category VARCHAR(20), title VARCHAR(20), message VARCHAR(255), is_completed VARCHAR(5), created_timestamp DATETIME, completed_timestamp DATETIME)"
     )
 mycursor.execute("SET SQL_MODE='ALLOW_INVALID_DATES';")
 
@@ -61,6 +61,9 @@ async def get_certain_to_do(id: Optional[str] | None=None, category: Optional[st
     
     if not any ((id, category, title, is_completed)):
         return things_to_do
+    
+    if not new_list:
+        raise HTTPException(status_code=404, detail="Query could not be populated")
 
     return new_list
 
@@ -88,18 +91,34 @@ async def delete_to_do(id: Optional[str] | None=None, category: Optional[str] | 
     mycursor.execute(sql_query, (id, category, is_completed, title))
     mydb.commit()
 
+    if not any ((id, category, title, is_completed)):
+        raise HTTPException(status_code=404, detail="Item cannot be found")
+
     return "Deletion Completed."
 
 
 @app.get("/to-do/{id}")
 async def get_single_to_to(id: str):
-    sql_query = "SELECT * FROM things_to_do WHERE id = %s"
-    return mycursor.execute(sql_query, (id,))
+    mycursor.execute("SELECT * FROM things_to_do WHERE id = %s", (id,))
+    thing = mycursor.fetchone()
+
+    if thing:
+        return {
+            "id": thing[0], 
+            "category": thing[1], 
+            "title": thing[2], 
+            "message": thing[3], 
+            "is_completed": thing[4], 
+            "created_timestamp": thing[5], 
+            "completed_timestamp": thing[6]
+            }
+    else:
+        raise HTTPException(status_code=404, detail="Item not found")
     
             
 @app.put("/to-do/{id}")
 async def update_to_do(id: str, updated_entry: To_Do):
-    sql_query = ("UPDATE things_to_do SET category = %s, title = %s, message = %s, is_completed = %s, completed_timestamp = %s WHERE id = %s")
+    sql_query = "UPDATE things_to_do SET category = %s, title = %s, message = %s, is_completed = %s, completed_timestamp = %s WHERE id = %s"
     mycursor.execute(
         sql_query, 
         (
@@ -112,4 +131,8 @@ async def update_to_do(id: str, updated_entry: To_Do):
         )
     )
     mydb.commit()
+
+    if not id:
+        raise HTTPException(status_code=404, detail="Item could not be found")
+
     return updated_entry
