@@ -10,14 +10,22 @@ from mysql.connector import MySQLConnection
 mydb = mysql.connector.connect(
     host="localhost",
     user="root",
-    passwd="password0123",
-    database="to_do_items"
+    passwd="password0123"
 )
 mycursor = mydb.cursor()
-mycursor.execute(f"CREATE DATABASE IF NOT EXISTS {mydb.database}")
-mycursor.execute(
-    "CREATE TABLE IF NOT EXISTS things_to_do (id VARCHAR(4), category VARCHAR(20), title VARCHAR(20), message VARCHAR(255), is_completed VARCHAR(5), created_timestamp DATETIME, completed_timestamp DATETIME)"
+mycursor.execute(f"CREATE DATABASE IF NOT EXISTS to_do_items")
+mycursor.execute("USE to_do_items")
+mycursor.execute("""
+    CREATE TABLE IF NOT EXISTS things_to_do (
+                 id VARCHAR(4) PRIMARY KEY NOT NULL, 
+                 category VARCHAR(20) NOT NULL, 
+                 title VARCHAR(20) NOT NULL, 
+                 message VARCHAR(255) NOT NULL, 
+                 is_completed VARCHAR(5), 
+                 created_timestamp DATETIME, 
+                 completed_timestamp DATETIME
     )
+""")
 mycursor.execute("SET SQL_MODE='ALLOW_INVALID_DATES';")
 
 app = FastAPI()
